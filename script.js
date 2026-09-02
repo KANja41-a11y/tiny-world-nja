@@ -1,223 +1,58 @@
-```javascript
-/* =========================================================
-   TINY LAND
-   Cozy Island Simulator
-   ========================================================= */
+/* =========================================
+   TINY WORLD
+   Cozy Life Simulator
+========================================= */
+
+const SAVE_KEY = "tinyWorldSave";
 
 
-/* =========================
-   GAME DATA
-========================= */
-
-const ITEMS = {
-
-  flower: {
-    name: "Flower",
-    icon: "🌷",
-    price: 20,
-    type: "decor",
-    xp: 5
-  },
-
-  tree: {
-    name: "Tree",
-    icon: "🌳",
-    price: 45,
-    type: "decor",
-    xp: 8
-  },
-
-  rock: {
-    name: "Rock",
-    icon: "🪨",
-    price: 15,
-    type: "decor",
-    xp: 3
-  },
-
-  bush: {
-    name: "Bush",
-    icon: "🌿",
-    price: 25,
-    type: "decor",
-    xp: 5
-  },
-
-  house: {
-    name: "Tiny House",
-    icon: "🏡",
-    price: 180,
-    type: "building",
-    xp: 25
-  },
-
-  cafe: {
-    name: "Café",
-    icon: "☕",
-    price: 250,
-    type: "building",
-    xp: 35
-  },
-
-  fountain: {
-    name: "Fountain",
-    icon: "⛲",
-    price: 140,
-    type: "decor",
-    xp: 20
-  },
-
-  bench: {
-    name: "Bench",
-    icon: "🪑",
-    price: 70,
-    type: "decor",
-    xp: 12
-  },
-
-  garden: {
-    name: "Garden",
-    icon: "🌱",
-    price: 100,
-    type: "building",
-    xp: 18
-  },
-
-  pumpkin: {
-    name: "Pumpkin",
-    icon: "🎃",
-    price: 30,
-    type: "decor",
-    xp: 6
-  },
-
-  mushroom: {
-    name: "Mushroom",
-    icon: "🍄",
-    price: 35,
-    type: "decor",
-    xp: 6
-  },
-
-  lantern: {
-    name: "Lantern",
-    icon: "🏮",
-    price: 60,
-    type: "decor",
-    xp: 10
-  }
-
-};
-
-
-const SHOP_ITEMS = [
-
-  {
-    id: "seed",
-    name: "Flower Seeds",
-    icon: "🌱",
-    price: 15,
-    description: "Plant something tiny."
-  },
-
-  {
-    id: "apple",
-    name: "Apple",
-    icon: "🍎",
-    price: 10,
-    description: "A sweet little snack."
-  },
-
-  {
-    id: "cookie",
-    name: "Cookie",
-    icon: "🍪",
-    price: 18,
-    description: "Made with love."
-  },
-
-  {
-    id: "star",
-    name: "Star Fragment",
-    icon: "⭐",
-    price: 75,
-    description: "A piece of the night sky."
-  },
-
-  {
-    id: "pet",
-    name: "Tiny Bunny",
-    icon: "🐰",
-    price: 300,
-    description: "Your new little friend."
-  }
-
-];
-
-
-/* =========================
-   DEFAULT GAME
-========================= */
+/* =========================================
+   DEFAULT DATA
+========================================= */
 
 const DEFAULT_GAME = {
+  name: "Mimi",
+  avatar: "🧑🏻‍🌾",
 
-  coins: 500,
+  coins: 120,
+  wood: 20,
+  gems: 5,
 
   level: 1,
-
   xp: 0,
 
-  happiness: 100,
+  happiness: 80,
 
   day: 1,
 
+  isNight: false,
+
   weather: "Sunny",
 
-  time: "Morning",
-
-  selected: "flower",
-
-  removeMode: false,
-
-  pet: false,
-
   inventory: {
-    seed: 3,
-    apple: 0,
-    cookie: 0,
-    star: 0
+    carrot: 2,
+    flower: 1,
+    wood: 5
   },
 
-  island: {},
-
   quests: {
+    water: 0,
+    feed: 0,
+    explore: 0
+  },
 
-    decorate: {
-      progress: 0,
-      goal: 5,
-      claimed: false
-    },
-
-    collect: {
-      progress: 0,
-      goal: 3,
-      claimed: false
-    },
-
-    earn: {
-      progress: 0,
-      goal: 300,
-      claimed: false
-    }
-
+  purchased: {
+    tree: 0,
+    flower: 0,
+    decoration: 0,
+    chick: 0
   }
-
 };
 
 
-/* =========================
-   LOAD / SAVE
-========================= */
+/* =========================================
+   GAME STATE
+========================================= */
 
 let game = loadGame();
 
@@ -226,1176 +61,1299 @@ function loadGame() {
 
   try {
 
-    const saved = localStorage.getItem("tinyLandSave");
+    const saved = localStorage.getItem(SAVE_KEY);
 
     if (!saved) {
       return structuredClone(DEFAULT_GAME);
     }
 
+    const data = JSON.parse(saved);
+
     return {
       ...structuredClone(DEFAULT_GAME),
-      ...JSON.parse(saved)
+      ...data,
+
+      inventory: {
+        ...DEFAULT_GAME.inventory,
+        ...(data.inventory || {})
+      },
+
+      quests: {
+        ...DEFAULT_GAME.quests,
+        ...(data.quests || {})
+      },
+
+      purchased: {
+        ...DEFAULT_GAME.purchased,
+        ...(data.purchased || {})
+      }
     };
 
   } catch (error) {
 
-    console.warn("Save data could not be loaded.");
+    console.error(error);
 
     return structuredClone(DEFAULT_GAME);
-
   }
-
 }
 
 
-function saveGame(showMessage = false) {
+function saveGame() {
 
   localStorage.setItem(
-    "tinyLandSave",
+    SAVE_KEY,
     JSON.stringify(game)
   );
 
-  if (showMessage) {
-    showToast("💾", "Island saved!");
-  }
-
-  updateUI();
-}
-
-
-/* =========================
-   DOM
-========================= */
-
-const grid = document.getElementById("islandGrid");
-
-const coinsEl = document.getElementById("coins");
-const levelEl = document.getElementById("level");
-const happinessEl = document.getElementById("happiness");
-
-const levelText = document.getElementById("levelText");
-const xpText = document.getElementById("xpText");
-const xpFill = document.getElementById("xpFill");
-
-const dayLabel = document.getElementById("dayLabel");
-
-const weatherIcon = document.getElementById("weatherIcon");
-const weatherName = document.getElementById("weatherName");
-const timeLabel = document.getElementById("timeLabel");
-
-const selectedIcon = document.getElementById("selectedIcon");
-const selectedName = document.getElementById("selectedName");
-
-const buildList = document.getElementById("buildList");
-
-const shopList = document.getElementById("shopList");
-const inventoryList = document.getElementById("inventoryList");
-const questList = document.getElementById("questList");
-
-const toast = document.getElementById("toast");
-const toastIcon = document.getElementById("toastIcon");
-const toastText = document.getElementById("toastText");
-
-
-/* =========================
-   GRID
-========================= */
-
-const GRID_WIDTH = 9;
-const GRID_HEIGHT = 7;
-const TOTAL_TILES = GRID_WIDTH * GRID_HEIGHT;
-
-
-function createGrid() {
-
-  grid.innerHTML = "";
-
-  for (let i = 0; i < TOTAL_TILES; i++) {
-
-    const tile = document.createElement("div");
-
-    tile.className = "tile";
-
-    tile.dataset.index = i;
-
-    tile.addEventListener("click", () => {
-
-      handleTileClick(i);
-
-    });
-
-    grid.appendChild(tile);
-
-  }
-
-  renderIsland();
-
-}
-
-
-function renderIsland() {
-
-  const tiles = grid.querySelectorAll(".tile");
-
-  tiles.forEach((tile, index) => {
-
-    tile.innerHTML = "";
-
-    const itemId = game.island[index];
-
-    if (itemId && ITEMS[itemId]) {
-
-      tile.classList.add("occupied");
-
-      const content = document.createElement("div");
-
-      content.className = "tile-content";
-
-      content.textContent = ITEMS[itemId].icon;
-
-      tile.appendChild(content);
-
-    } else {
-
-      tile.classList.remove("occupied");
-
-    }
-
-  });
-
-}
-
-
-/* =========================
-   TILE CLICK
-========================= */
-
-function handleTileClick(index) {
-
-  const currentItem = game.island[index];
-
-  /* REMOVE */
-
-  if (game.removeMode) {
-
-    if (!currentItem) {
-
-      showToast("🌱", "There's nothing here!");
-
-      return;
-
-    }
-
-    const removed = ITEMS[currentItem];
-
-    delete game.island[index];
-
-    game.happiness = Math.min(
-      100,
-      game.happiness + 1
-    );
-
-    saveGame();
-
-    renderIsland();
-
-    showToast(
-      "🗑️",
-      `${removed.name} removed.`
-    );
-
-    return;
-  }
-
-
-  /* OCCUPIED */
-
-  if (currentItem) {
-
-    showToast(
-      ITEMS[currentItem].icon,
-      "This spot is already occupied!"
-    );
-
-    return;
-  }
-
-
-  /* PLACE ITEM */
-
-  const itemId = game.selected;
-  const item = ITEMS[itemId];
-
-  if (!item) return;
-
-
-  if (game.coins < item.price) {
-
-    showToast(
-      "💸",
-      "Not enough Tiny Coins!"
-    );
-
-    return;
-  }
-
-
-  game.coins -= item.price;
-
-  game.island[index] = itemId;
-
-  game.happiness = Math.min(
-    100,
-    game.happiness + 2
-  );
-
-  addXP(item.xp);
-
-  game.quests.decorate.progress =
-    Math.min(
-      game.quests.decorate.goal,
-      game.quests.decorate.progress + 1
-    );
-
-  saveGame();
-
-  renderIsland();
-
   showToast(
-    item.icon,
-    `${item.name} placed!`
+    "💾",
+    "Your Tiny World has been saved!"
   );
-
 }
 
 
-/* =========================
-   BUILD MENU
-========================= */
+/* =========================================
+   HELPERS
+========================================= */
 
-function renderBuildItems() {
-
-  buildList.innerHTML = "";
-
-  Object.entries(ITEMS).forEach(
-    ([id, item]) => {
-
-      const button = document.createElement("button");
-
-      button.className =
-        "build-item" +
-        (game.selected === id && !game.removeMode
-          ? " selected"
-          : "");
-
-      button.innerHTML = `
-        <span class="item-icon">${item.icon}</span>
-        <span class="item-name">${item.name}</span>
-        <span class="item-price">🪙 ${item.price}</span>
-      `;
-
-      button.addEventListener("click", () => {
-
-        game.selected = id;
-
-        game.removeMode = false;
-
-        updateSelectedInfo();
-
-        renderBuildItems();
-
-        document
-          .getElementById("removeButton")
-          .classList.remove("active");
-
-      });
-
-      buildList.appendChild(button);
-
-    }
-  );
-
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
 }
 
-
-/* =========================
-   SELECTED ITEM
-========================= */
-
-function updateSelectedInfo() {
-
-  const item = ITEMS[game.selected];
-
-  if (!item) return;
-
-  selectedIcon.textContent = item.icon;
-
-  selectedName.textContent =
-    game.removeMode
-      ? "Remove"
-      : item.name;
-
-}
-
-
-/* =========================
-   REMOVE MODE
-========================= */
-
-document
-  .getElementById("removeButton")
-  .addEventListener("click", () => {
-
-    game.removeMode = !game.removeMode;
-
-    const button =
-      document.getElementById("removeButton");
-
-    button.classList.toggle(
-      "active",
-      game.removeMode
-    );
-
-    updateSelectedInfo();
-
-    renderBuildItems();
-
-    showToast(
-      game.removeMode ? "🗑️" : "🌱",
-      game.removeMode
-        ? "Remove mode on."
-        : "Build mode on."
-    );
-
-  });
-
-
-/* =========================
-   XP / LEVEL
-========================= */
 
 function addXP(amount) {
 
   game.xp += amount;
 
-  const xpNeeded =
-    100 + (game.level - 1) * 50;
+  let needed = 100 + (game.level - 1) * 40;
 
+  while (game.xp >= needed) {
 
-  while (game.xp >= xpNeededForLevel()) {
-
-    game.xp -= xpNeededForLevel();
+    game.xp -= needed;
 
     game.level++;
 
-    game.coins += 100;
-
-    game.happiness = Math.min(
-      100,
-      game.happiness + 10
-    );
+    game.coins += 50;
 
     showToast(
-      "⭐",
-      `Level ${game.level}! +100 coins`
+      "🎉",
+      `Level up! You are now level ${game.level}!`
     );
 
+    needed = 100 + (game.level - 1) * 40;
   }
-
 }
 
 
-function xpNeededForLevel() {
+function updateUI() {
 
-  return 100 + (game.level - 1) * 50;
+  document.getElementById("coins").textContent =
+    game.coins;
 
+  document.getElementById("wood").textContent =
+    game.wood;
+
+  document.getElementById("gems").textContent =
+    game.gems;
+
+  document.getElementById("level").textContent =
+    game.level;
+
+  document.getElementById("xp").textContent =
+    game.xp;
+
+
+  const needed =
+    100 + (game.level - 1) * 40;
+
+  const percent =
+    (game.xp / needed) * 100;
+
+  document.getElementById("xpBar").style.width =
+    `${percent}%`;
+
+
+  document.getElementById("playerName").textContent =
+    game.name;
+
+  document.getElementById("welcomeName").textContent =
+    game.name;
+
+  document.getElementById("playerAvatar").textContent =
+    game.avatar;
+
+  document.getElementById("player").querySelector("span").textContent =
+    game.avatar;
+
+  document.getElementById("player").querySelector("small").textContent =
+    game.name;
+
+
+  updateWeather();
+
+  updateInventory();
+
+  updateQuests();
+
+  updateMood();
 }
 
 
-/* =========================
+/* =========================================
+   MOOD
+========================================= */
+
+function updateMood() {
+
+  const mood = document.getElementById("playerMood");
+
+  if (game.happiness >= 90) {
+
+    mood.textContent =
+      "Super happy! ✨";
+
+  } else if (game.happiness >= 70) {
+
+    mood.textContent =
+      "Feeling cozy ☁️";
+
+  } else if (game.happiness >= 40) {
+
+    mood.textContent =
+      "A little tired... 🌧️";
+
+  } else {
+
+    mood.textContent =
+      "Needs some love 🥺";
+  }
+}
+
+
+/* =========================================
    WEATHER
-========================= */
+========================================= */
 
-const WEATHER = [
-
+const weatherTypes = [
   {
     name: "Sunny",
-    icon: "☀️"
+    icon: "☀️",
+    temp: "24°C"
   },
-
   {
     name: "Cloudy",
-    icon: "☁️"
+    icon: "☁️",
+    temp: "21°C"
   },
-
   {
     name: "Rainy",
-    icon: "🌧️"
+    icon: "🌧️",
+    temp: "19°C"
   },
-
   {
     name: "Rainbow",
-    icon: "🌈"
-  },
-
-  {
-    name: "Starry",
-    icon: "🌟"
+    icon: "🌈",
+    temp: "23°C"
   }
-
 ];
 
 
-function randomWeather() {
+function updateWeather() {
 
   const weather =
-    WEATHER[
-      Math.floor(
-        Math.random() * WEATHER.length
-      )
-    ];
+    weatherTypes.find(
+      w => w.name === game.weather
+    ) || weatherTypes[0];
 
-  game.weather = weather.name;
 
-  weatherIcon.textContent = weather.icon;
-  weatherName.textContent = weather.name;
+  document.getElementById("weatherIcon").textContent =
+    weather.icon;
 
+  document.getElementById("bigWeather").textContent =
+    weather.icon;
+
+  document.getElementById("weatherName").textContent =
+    weather.name;
+
+  document.getElementById("temperature").textContent =
+    weather.temp;
+
+  document.getElementById("timeText").textContent =
+    game.isNight ? "Peaceful Night" : `${weather.name} Day`;
+
+  document.getElementById("dayText").textContent =
+    `Day ${game.day}`;
+
+  document.getElementById("celestial").textContent =
+    game.isNight ? "🌙" : "☀️";
+
+  document.body.classList.toggle(
+    "night",
+    game.isNight
+  );
 }
 
 
-/* =========================
-   TIME
-========================= */
+/* =========================================
+   NAVIGATION
+========================================= */
 
-function updateTime() {
+document.querySelectorAll(".menu-btn")
+  .forEach(button => {
 
-  const hour = new Date().getHours();
+    button.addEventListener("click", () => {
 
-  let time;
+      const target =
+        button.dataset.panel;
 
-  if (hour >= 5 && hour < 11) {
-    time = "Morning";
-  } else if (hour >= 11 && hour < 17) {
-    time = "Afternoon";
-  } else if (hour >= 17 && hour < 21) {
-    time = "Sunset";
-  } else {
-    time = "Night";
-  }
+      document.querySelectorAll(".menu-btn")
+        .forEach(btn =>
+          btn.classList.remove("active")
+        );
 
-  game.time = time;
-
-  timeLabel.textContent = time;
-
-  if (time === "Night") {
-
-    document.querySelector(".world-wrapper").style.background =
-      "linear-gradient(#55557d 0 57%, #4d7791 57% 100%)";
-
-  } else if (time === "Sunset") {
-
-    document.querySelector(".world-wrapper").style.background =
-      "linear-gradient(#f2c8b6 0 57%, #9ac6d8 57% 100%)";
-
-  } else {
-
-    document.querySelector(".world-wrapper").style.background =
-      "linear-gradient(#cfeef9 0 57%, #b5e2f2 57% 100%)";
-
-  }
-
-}
+      button.classList.add("active");
 
 
-/* =========================
-   SHOP
-========================= */
+      document.querySelectorAll(".panel")
+        .forEach(panel =>
+          panel.classList.remove("active")
+        );
 
-function renderShop() {
 
-  shopList.innerHTML = "";
+      document.getElementById(
+        `${target}Panel`
+      ).classList.add("active");
 
-  SHOP_ITEMS.forEach(item => {
-
-    const owned =
-      item.id === "pet"
-        ? game.pet
-        : game.inventory[item.id] || 0;
-
-    const buttonText =
-      item.id === "pet" && game.pet
-        ? "Owned"
-        : `Buy · 🪙 ${item.price}`;
-
-    const card =
-      document.createElement("div");
-
-    card.className = "shop-item";
-
-    card.innerHTML = `
-      <div class="shop-item-icon">${item.icon}</div>
-
-      <h3>${item.name}</h3>
-
-      <p>${item.description}</p>
-
-      <button
-        class="buy-button"
-        ${game.coins < item.price || (item.id === "pet" && game.pet)
-          ? "disabled"
-          : ""}
-      >
-        ${buttonText}
-      </button>
-    `;
-
-    card
-      .querySelector(".buy-button")
-      .addEventListener("click", () => {
-
-        buyShopItem(item);
-
-      });
-
-    shopList.appendChild(card);
+    });
 
   });
 
+
+/* =========================================
+   WORLD OBJECT INTERACTIONS
+========================================= */
+
+document.querySelectorAll(".world-object")
+  .forEach(object => {
+
+    object.addEventListener("click", () => {
+
+      const type =
+        object.dataset.object;
+
+      interactWithWorld(type);
+
+    });
+
+  });
+
+
+function interactWithWorld(type) {
+
+  switch (type) {
+
+    case "house":
+
+      openDialog(
+        "🏠",
+        "Your Cozy Home",
+        "It's warm, cute and completely yours. You can imagine a tiny kitchen, a soft bed and lots of plants inside. 🪴"
+      );
+
+      break;
+
+
+    case "tree":
+
+      game.wood += 2;
+
+      game.inventory.wood =
+        (game.inventory.wood || 0) + 2;
+
+      addXP(5);
+
+      showToast(
+        "🌳",
+        "You collected 2 pieces of wood!"
+      );
+
+      break;
+
+
+    case "flower":
+
+      game.inventory.flower =
+        (game.inventory.flower || 0) + 1;
+
+      game.happiness =
+        clamp(game.happiness + 2, 0, 100);
+
+      addXP(4);
+
+      showToast(
+        "🌸",
+        "You picked a pretty flower!"
+      );
+
+      break;
+
+
+    case "farm":
+
+      waterGarden();
+
+      break;
+
+
+    case "pet":
+
+      feedBunny();
+
+      break;
+
+
+    case "well":
+
+      game.happiness =
+        clamp(game.happiness + 5, 0, 100);
+
+      showToast(
+        "💧",
+        "You took a refreshing sip from the well."
+      );
+
+      addXP(3);
+
+      break;
+
+
+    case "bridge":
+
+      explore();
+
+      break;
+  }
+
+  updateUI();
+  localStorage.setItem(SAVE_KEY, JSON.stringify(game));
 }
 
 
-function buyShopItem(item) {
+/* =========================================
+   ACTION BUTTONS
+========================================= */
 
-  if (game.coins < item.price) {
+document.querySelectorAll(".action-card")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      const action =
+        button.dataset.action;
+
+      if (action === "water") {
+        waterGarden();
+      }
+
+      if (action === "harvest") {
+        harvest();
+      }
+
+      if (action === "feed") {
+        feedBunny();
+      }
+
+      if (action === "explore") {
+        explore();
+      }
+
+      updateUI();
+
+      localStorage.setItem(
+        SAVE_KEY,
+        JSON.stringify(game)
+      );
+    });
+
+  });
+
+
+/* =========================================
+   WATER GARDEN
+========================================= */
+
+function waterGarden() {
+
+  game.quests.water =
+    clamp(game.quests.water + 1, 0, 3);
+
+  game.happiness =
+    clamp(game.happiness + 7, 0, 100);
+
+  addXP(10);
+
+  showToast(
+    "💧",
+    "Your garden looks so fresh! 🌱"
+  );
+
+  if (game.quests.water === 3) {
+
+    game.coins += 40;
 
     showToast(
-      "💸",
-      "Not enough coins!"
+      "🎉",
+      "Garden quest complete! +40 coins"
+    );
+  }
+}
+
+
+/* =========================================
+   HARVEST
+========================================= */
+
+function harvest() {
+
+  const amount =
+    Math.floor(Math.random() * 3) + 1;
+
+  game.coins += amount * 8;
+
+  game.inventory.carrot =
+    (game.inventory.carrot || 0) + amount;
+
+  addXP(12);
+
+  showToast(
+    "🥕",
+    `You harvested ${amount} carrot${amount > 1 ? "s" : ""}!`
+  );
+}
+
+
+/* =========================================
+   BUNNY
+========================================= */
+
+function feedBunny() {
+
+  if ((game.inventory.carrot || 0) <= 0) {
+
+    showToast(
+      "🥺",
+      "You need a carrot to feed your bunny!"
     );
 
     return;
   }
 
 
-  if (item.id === "pet" && game.pet) {
+  game.inventory.carrot--;
 
-    return;
+  game.quests.feed =
+    clamp(game.quests.feed + 1, 0, 2);
 
-  }
+  game.happiness =
+    clamp(game.happiness + 10, 0, 100);
+
+  addXP(8);
 
 
-  game.coins -= item.price;
+  if (game.quests.feed === 2) {
 
+    game.gems += 1;
 
-  if (item.id === "pet") {
+    showToast(
+      "💎",
+      "Bunny quest complete! +1 gem"
+    );
 
-    game.pet = true;
-
-    game.happiness = 100;
-
-    document.querySelector(".avatar").textContent = "🐰";
-
-    addXP(30);
+  } else {
 
     showToast(
       "🐰",
-      "You adopted a Tiny Bunny!"
+      "Your bunny is very happy! ♡"
     );
+  }
+}
 
-  } else {
 
-    game.inventory[item.id] =
-      (game.inventory[item.id] || 0) + 1;
+/* =========================================
+   EXPLORE
+========================================= */
 
-    showToast(
-      item.icon,
-      `${item.name} added to inventory.`
-    );
+function explore() {
+
+  game.quests.explore =
+    clamp(game.quests.explore + 1, 0, 2);
+
+
+  const rewards = [
+    {
+      icon: "🌲",
+      text: "You found some wood!",
+      type: "wood"
+    },
+    {
+      icon: "🌸",
+      text: "You found a flower!",
+      type: "flower"
+    },
+    {
+      icon: "🪙",
+      text: "You found some coins!",
+      type: "coins"
+    },
+    {
+      icon: "💎",
+      text: "OMG! You found a gem!",
+      type: "gem"
+    }
+  ];
+
+
+  const reward =
+    rewards[Math.floor(Math.random() * rewards.length)];
+
+
+  if (reward.type === "wood") {
+
+    game.wood += 3;
+
+    game.inventory.wood =
+      (game.inventory.wood || 0) + 3;
 
   }
 
 
-  saveGame();
+  if (reward.type === "flower") {
 
-  renderShop();
+    game.inventory.flower =
+      (game.inventory.flower || 0) + 1;
 
-  renderInventory();
+  }
 
+
+  if (reward.type === "coins") {
+
+    game.coins += 25;
+
+  }
+
+
+  if (reward.type === "gem") {
+
+    game.gems += 1;
+
+  }
+
+
+  addXP(15);
+
+
+  if (game.quests.explore === 2) {
+
+    game.coins += 50;
+
+    showToast(
+      "🎉",
+      `${reward.text} Quest complete! +50 coins`
+    );
+
+  } else {
+
+    showToast(
+      reward.icon,
+      reward.text
+    );
+  }
 }
 
 
-/* =========================
-   INVENTORY
-========================= */
+/* =========================================
+   DAY / NIGHT
+========================================= */
 
-function renderInventory() {
+document.getElementById("dayNightBtn")
+  .addEventListener("click", () => {
 
-  inventoryList.innerHTML = "";
+    game.isNight =
+      !game.isNight;
 
-  const inventory = game.inventory;
+    updateWeather();
 
-  Object.entries(inventory).forEach(
-    ([id, quantity]) => {
+    showToast(
+      game.isNight ? "🌙" : "☀️",
+      game.isNight
+        ? "The tiny world is sleeping..."
+        : "Good morning, Tiny World!"
+    );
 
-      const item =
-        SHOP_ITEMS.find(
-          item => item.id === id
-        );
-
-      if (!item) return;
-
-      const card =
-        document.createElement("div");
-
-      card.className = "inventory-item";
-
-      card.innerHTML = `
-        <div class="inventory-item-icon">
-          ${item.icon}
-        </div>
-
-        <strong>${item.name}</strong>
-
-        <span>× ${quantity}</span>
-      `;
-
-      inventoryList.appendChild(card);
-
-    }
-  );
-
-
-  const petCard =
-    document.createElement("div");
-
-  petCard.className = "inventory-item";
-
-  petCard.innerHTML = `
-    <div class="inventory-item-icon">
-      ${game.pet ? "🐰" : "🥚"}
-    </div>
-
-    <strong>Pet</strong>
-
-    <span>
-      ${game.pet ? "Tiny Bunny" : "None"}
-    </span>
-  `;
-
-  inventoryList.appendChild(petCard);
-
-}
-
-
-/* =========================
-   QUESTS
-========================= */
-
-function renderQuests() {
-
-  questList.innerHTML = "";
-
-  const quests = [
-
-    {
-      id: "decorate",
-      icon: "🌷",
-      title: "Make It Pretty",
-      description: "Place 5 decorations on your island.",
-      reward: 100
-    },
-
-    {
-      id: "collect",
-      icon: "🎁",
-      title: "Little Collector",
-      description: "Buy 3 things from the Tiny Shop.",
-      reward: 120
-    },
-
-    {
-      id: "earn",
-      icon: "🪙",
-      title: "Tiny Business",
-      description: "Earn 300 Tiny Coins.",
-      reward: 180
-    }
-
-  ];
-
-
-  quests.forEach(quest => {
-
-    const data = game.quests[quest.id];
-
-    const percent =
-      Math.min(
-        100,
-        (data.progress / quest.goal) * 100
-      );
-
-
-    const card =
-      document.createElement("div");
-
-    card.className = "quest";
-
-    const completed =
-      data.progress >= quest.goal;
-
-    card.innerHTML = `
-      <div class="quest-top">
-
-        <div>
-          <h3>
-            ${quest.icon} ${quest.title}
-          </h3>
-
-          <p>
-            ${quest.description}
-          </p>
-        </div>
-
-        <span class="quest-reward">
-          +${quest.reward} 🪙
-        </span>
-
-      </div>
-
-      <div class="quest-progress">
-        <div style="width:${percent}%"></div>
-      </div>
-
-      <p>
-        ${Math.min(data.progress, quest.goal)}
-        / ${quest.goal}
-      </p>
-
-      ${
-        completed && !data.claimed
-          ? `<button class="claim-button">
-              Claim Reward
-            </button>`
-          : data.claimed
-            ? `<button class="claim-button" disabled>
-                ✓ Completed
-              </button>`
-            : ""
-      }
-    `;
-
-
-    const claimButton =
-      card.querySelector(".claim-button");
-
-
-    if (claimButton && !data.claimed) {
-
-      claimButton.addEventListener(
-        "click",
-        () => {
-
-          game.coins += quest.reward;
-
-          data.claimed = true;
-
-          addXP(20);
-
-          saveGame();
-
-          renderQuests();
-
-          showToast(
-            "🎁",
-            `+${quest.reward} coins!`
-          );
-
-        }
-      );
-
-    }
-
-
-    questList.appendChild(card);
-
+    localStorage.setItem(
+      SAVE_KEY,
+      JSON.stringify(game)
+    );
   });
 
-}
+
+/* =========================================
+   WEATHER CHANGE
+========================================= */
+
+document.getElementById("weatherBtn")
+  .addEventListener("click", () => {
+
+    const current =
+      weatherTypes.findIndex(
+        weather => weather.name === game.weather
+      );
+
+    const next =
+      (current + 1) % weatherTypes.length;
+
+    game.weather =
+      weatherTypes[next].name;
+
+    updateWeather();
+
+    showToast(
+      weatherTypes[next].icon,
+      `Weather changed to ${weatherTypes[next].name}!`
+    );
+
+    localStorage.setItem(
+      SAVE_KEY,
+      JSON.stringify(game)
+    );
+  });
 
 
-/* =========================
-   MODALS
-========================= */
+/* =========================================
+   SHOP
+========================================= */
 
-function openModal(id) {
-
-  document
-    .getElementById(id)
-    .classList.add("show");
-
-}
-
-
-function closeModal(id) {
-
-  document
-    .getElementById(id)
-    .classList.remove("show");
-
-}
-
-
-document
-  .querySelectorAll("[data-close]")
+document.querySelectorAll("[data-buy]")
   .forEach(button => {
 
-    button.addEventListener(
-      "click",
-      () => {
+    button.addEventListener("click", () => {
 
-        closeModal(button.dataset.close);
+      const item =
+        button.dataset.buy;
 
+      const price =
+        Number(button.dataset.price);
+
+
+      if (game.coins < price) {
+
+        showToast(
+          "🥺",
+          "You don't have enough coins!"
+        );
+
+        return;
       }
-    );
-
-  });
 
 
-document
-  .querySelectorAll(".modal-overlay")
-  .forEach(overlay => {
+      game.coins -= price;
 
-    overlay.addEventListener(
-      "click",
-      event => {
+      game.purchased[item] =
+        (game.purchased[item] || 0) + 1;
 
-        if (event.target === overlay) {
 
-          overlay.classList.remove("show");
+      if (item === "tree") {
 
-        }
-
+        game.inventory.tree =
+          (game.inventory.tree || 0) + 1;
       }
-    );
 
-  });
+      if (item === "flower") {
+
+        game.inventory.flower =
+          (game.inventory.flower || 0) + 3;
+      }
+
+      if (item === "decoration") {
+
+        game.inventory.decoration =
+          (game.inventory.decoration || 0) + 1;
+      }
+
+      if (item === "chick") {
+
+        game.inventory.chick =
+          (game.inventory.chick || 0) + 1;
+      }
 
 
-/* =========================
-   NAVIGATION
-========================= */
+      addXP(10);
 
-function handlePanel(panel) {
+      showToast(
+        "🛍️",
+        "Purchase complete! Added to inventory."
+      );
 
-  document
-    .querySelectorAll(".menu-button, .mobile-nav-button")
-    .forEach(button => {
 
-      button.classList.toggle(
-        "active",
-        button.dataset.panel === panel
+      updateUI();
+
+      localStorage.setItem(
+        SAVE_KEY,
+        JSON.stringify(game)
       );
 
     });
 
+  });
 
-  if (panel === "shop") {
 
-    renderShop();
+/* =========================================
+   INVENTORY
+========================================= */
 
-    openModal("shopModal");
+const itemData = {
 
+  carrot: {
+    icon: "🥕",
+    name: "Carrot"
+  },
+
+  flower: {
+    icon: "🌸",
+    name: "Flower"
+  },
+
+  wood: {
+    icon: "🪵",
+    name: "Wood"
+  },
+
+  tree: {
+    icon: "🌳",
+    name: "Little Tree"
+  },
+
+  decoration: {
+    icon: "🪴",
+    name: "Decoration"
+  },
+
+  chick: {
+    icon: "🐥",
+    name: "Little Chick"
   }
+};
 
-  if (panel === "inventory") {
 
-    renderInventory();
+function updateInventory() {
 
-    openModal("inventoryModal");
+  const grid =
+    document.getElementById("inventoryGrid");
 
+  grid.innerHTML = "";
+
+
+  let hasItem = false;
+
+
+  Object.entries(game.inventory)
+    .forEach(([key, amount]) => {
+
+      if (!amount || amount <= 0) {
+        return;
+      }
+
+      hasItem = true;
+
+
+      const data =
+        itemData[key] || {
+          icon: "📦",
+          name: key
+        };
+
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "inventory-item";
+
+
+      div.innerHTML = `
+        <div class="item-icon">${data.icon}</div>
+        <strong>${data.name}</strong>
+        <small>x${amount}</small>
+      `;
+
+
+      grid.appendChild(div);
+    });
+
+
+  if (!hasItem) {
+
+    grid.innerHTML = `
+      <div class="inventory-item">
+        <div class="item-icon">🫧</div>
+        <strong>Empty</strong>
+        <small>Go explore!</small>
+      </div>
+    `;
   }
-
-  if (panel === "quests") {
-
-    renderQuests();
-
-    openModal("questsModal");
-
-  }
-
 }
 
 
-document
-  .querySelectorAll(".menu-button, .mobile-nav-button")
+/* =========================================
+   QUEST UI
+========================================= */
+
+function updateQuests() {
+
+  const water =
+    game.quests.water;
+
+  const feed =
+    game.quests.feed;
+
+  const explore =
+    game.quests.explore;
+
+
+  document.getElementById("waterQuestText")
+    .textContent = `${water} / 3`;
+
+  document.getElementById("feedQuestText")
+    .textContent = `${feed} / 2`;
+
+  document.getElementById("exploreQuestText")
+    .textContent = `${explore} / 2`;
+
+
+  document.getElementById("waterQuestBar")
+    .style.width =
+      `${(water / 3) * 100}%`;
+
+
+  document.getElementById("feedQuestBar")
+    .style.width =
+      `${(feed / 2) * 100}%`;
+
+
+  document.getElementById("exploreQuestBar")
+    .style.width =
+      `${(explore / 2) * 100}%`;
+}
+
+
+/* =========================================
+   CHARACTER
+========================================= */
+
+document.querySelectorAll("[data-character]")
   .forEach(button => {
 
-    button.addEventListener(
-      "click",
-      () => {
+    button.addEventListener("click", () => {
 
-        handlePanel(
-          button.dataset.panel
-        );
+      game.avatar =
+        button.dataset.character;
 
-      }
-    );
+      updateUI();
+
+      showToast(
+        "✨",
+        "Your character looks adorable!"
+      );
+
+      localStorage.setItem(
+        SAVE_KEY,
+        JSON.stringify(game)
+      );
+    });
 
   });
 
 
-/* =========================
-   SAVE BUTTON
-========================= */
+/* =========================================
+   NAME
+========================================= */
 
-document
-  .getElementById("saveButton")
-  .addEventListener(
-    "click",
-    () => {
+document.getElementById("nameInput")
+  .addEventListener("change", event => {
 
-      saveGame(true);
+    const name =
+      event.target.value.trim();
 
+    if (!name) {
+      event.target.value = game.name;
+      return;
     }
-  );
 
 
-/* =========================
-   SOUND
-========================= */
+    game.name = name;
 
-let soundOn = true;
+    updateUI();
 
-document
-  .getElementById("soundButton")
-  .addEventListener(
-    "click",
-    () => {
+    showToast(
+      "💗",
+      `Hello, ${game.name}!`
+    );
 
-      soundOn = !soundOn;
+    localStorage.setItem(
+      SAVE_KEY,
+      JSON.stringify(game)
+    );
+  });
 
-      document.getElementById(
-        "soundButton"
-      ).textContent =
-        soundOn ? "🔊" : "🔇";
 
-      showToast(
-        soundOn ? "🔊" : "🔇",
-        soundOn
-          ? "Sound on."
-          : "Sound off."
-      );
+/* =========================================
+   DIALOG
+========================================= */
 
+function openDialog(icon, title, text) {
+
+  document.getElementById("dialogCharacter")
+    .textContent = icon;
+
+  document.getElementById("dialogTitle")
+    .textContent = title;
+
+  document.getElementById("dialogText")
+    .textContent = text;
+
+  document.getElementById("dialogOverlay")
+    .classList.add("show");
+}
+
+
+function closeDialog() {
+
+  document.getElementById("dialogOverlay")
+    .classList.remove("show");
+}
+
+
+document.getElementById("closeDialog")
+  .addEventListener("click", closeDialog);
+
+document.getElementById("dialogOk")
+  .addEventListener("click", closeDialog);
+
+document.getElementById("dialogOverlay")
+  .addEventListener("click", event => {
+
+    if (
+      event.target.id === "dialogOverlay"
+    ) {
+      closeDialog();
     }
-  );
+  });
 
 
-/* =========================
+/* =========================================
    TOAST
-========================= */
+========================================= */
 
 let toastTimer;
 
 
-function showToast(icon, message) {
+function showToast(icon, text) {
 
-  toastIcon.textContent = icon;
-  toastText.textContent = message;
+  const toast =
+    document.getElementById("toast");
+
+  document.getElementById("toastIcon")
+    .textContent = icon;
+
+  document.getElementById("toastText")
+    .textContent = text;
+
 
   toast.classList.add("show");
 
+
   clearTimeout(toastTimer);
+
 
   toastTimer =
     setTimeout(() => {
 
       toast.classList.remove("show");
 
-    }, 2200);
-
+    }, 2600);
 }
 
 
-/* =========================
+/* =========================================
+   SAVE BUTTON
+========================================= */
+
+document.getElementById("saveBtn")
+  .addEventListener("click", () => {
+
+    localStorage.setItem(
+      SAVE_KEY,
+      JSON.stringify(game)
+    );
+
+    showToast(
+      "💾",
+      "Tiny World saved successfully!"
+    );
+  });
+
+
+/* =========================================
    RESET
-========================= */
+========================================= */
 
-document
-  .getElementById("resetButton")
-  .addEventListener(
-    "click",
-    () => {
+document.getElementById("resetBtn")
+  .addEventListener("click", () => {
 
-      const confirmReset =
-        confirm(
-          "Reset your Tiny Land? All progress will be deleted."
-        );
-
-      if (!confirmReset) return;
-
-      localStorage.removeItem(
-        "tinyLandSave"
+    const confirmReset =
+      confirm(
+        "Are you sure you want to reset your Tiny World?"
       );
 
-      game =
-        structuredClone(DEFAULT_GAME);
 
-      createGrid();
+    if (!confirmReset) {
+      return;
+    }
 
-      renderBuildItems();
 
-      updateUI();
+    game =
+      structuredClone(DEFAULT_GAME);
 
-      showToast(
-        "🌱",
-        "A new Tiny Land has begun!"
-      );
 
+    localStorage.removeItem(
+      SAVE_KEY
+    );
+
+
+    document.getElementById("nameInput")
+      .value = game.name;
+
+
+    updateUI();
+
+
+    showToast(
+      "🌱",
+      "Your Tiny World has been restarted!"
+    );
+  });
+
+
+/* =========================================
+   PLAYER INTERACTION
+========================================= */
+
+document.getElementById("player")
+  .addEventListener("click", () => {
+
+    const messages = [
+
+      `Hi! I'm ${game.name}! 🌱`,
+
+      "I think my tiny world is getting prettier!",
+
+      "Maybe I'll go explore later... 👀",
+
+      "I love living here! ♡",
+
+      "Don't forget to take care of the garden!"
+    ];
+
+
+    const message =
+      messages[
+        Math.floor(
+          Math.random() * messages.length
+        )
+      ];
+
+
+    openDialog(
+      game.avatar,
+      game.name,
+      message
+    );
+  });
+
+
+/* =========================================
+   PET RANDOM MOVEMENT
+========================================= */
+
+function moveBunny() {
+
+  const bunny =
+    document.querySelector(".pet");
+
+  const positions = [
+    {
+      right: "39%",
+      bottom: "27%"
+    },
+    {
+      right: "32%",
+      bottom: "22%"
+    },
+    {
+      right: "45%",
+      bottom: "25%"
+    },
+    {
+      right: "26%",
+      bottom: "31%"
+    }
+  ];
+
+
+  const pos =
+    positions[
+      Math.floor(
+        Math.random() * positions.length
+      )
+    ];
+
+
+  bunny.style.right =
+    pos.right;
+
+  bunny.style.bottom =
+    pos.bottom;
+}
+
+
+setInterval(moveBunny, 5000);
+
+
+/* =========================================
+   RANDOM WORLD SPARKLE
+========================================= */
+
+function randomSparkle() {
+
+  const world =
+    document.getElementById("world");
+
+  const sparkle =
+    document.createElement("div");
+
+  sparkle.textContent =
+    Math.random() > .5 ? "✦" : "✧";
+
+  sparkle.style.position =
+    "absolute";
+
+  sparkle.style.left =
+    `${Math.random() * 90 + 5}%`;
+
+  sparkle.style.top =
+    `${Math.random() * 70 + 10}%`;
+
+  sparkle.style.color =
+    "white";
+
+  sparkle.style.fontSize =
+    "15px";
+
+  sparkle.style.pointerEvents =
+    "none";
+
+  sparkle.style.zIndex =
+    "30";
+
+  world.appendChild(sparkle);
+
+
+  sparkle.animate(
+    [
+      {
+        opacity: 0,
+        transform: "translateY(10px) scale(.5)"
+      },
+      {
+        opacity: 1,
+        transform: "translateY(0) scale(1)"
+      },
+      {
+        opacity: 0,
+        transform: "translateY(-15px) scale(.5)"
+      }
+    ],
+    {
+      duration: 1500,
+      easing: "ease-out"
     }
   );
 
 
-/* =========================
-   UI UPDATE
-========================= */
-
-function updateUI() {
-
-  coinsEl.textContent =
-    game.coins.toLocaleString();
-
-  levelEl.textContent =
-    game.level;
-
-  happinessEl.textContent =
-    game.happiness;
-
-  levelText.textContent =
-    game.level;
-
-  const needed =
-    xpNeededForLevel();
-
-  xpText.textContent =
-    `${game.xp} / ${needed} XP`;
-
-  xpFill.style.width =
-    `${Math.min(100, (game.xp / needed) * 100)}%`;
-
-  dayLabel.textContent =
-    `Day ${game.day}`;
-
-  updateSelectedInfo();
-
-  updateTime();
-
-  const weather =
-    WEATHER.find(
-      w => w.name === game.weather
-    ) || WEATHER[0];
-
-  weatherIcon.textContent =
-    weather.icon;
-
-  weatherName.textContent =
-    game.weather;
-
-  document.querySelector(
-    ".avatar"
-  ).textContent =
-    game.pet ? "🐰" : "🌱";
-
+  setTimeout(
+    () => sparkle.remove(),
+    1500
+  );
 }
 
 
-/* =========================
-   DAILY PROGRESSION
-========================= */
+setInterval(randomSparkle, 2200);
 
-let lastDay =
-  localStorage.getItem(
-    "tinyLandLastDay"
-  );
 
+/* =========================================
+   AUTOMATIC DAY CHANGE
+========================================= */
 
 const today =
   new Date().toDateString();
 
+const lastDate =
+  localStorage.getItem("tinyWorldDate");
 
-if (lastDay !== today) {
 
-  if (lastDay !== null) {
+if (
+  lastDate &&
+  lastDate !== today
+) {
 
-    game.day++;
+  game.day++;
 
-    game.coins += 50;
+  game.quests = {
+    water: 0,
+    feed: 0,
+    explore: 0
+  };
 
-    game.happiness =
-      Math.min(
-        100,
-        game.happiness + 5
-      );
+  game.coins += 30;
 
-    randomWeather();
-
-    showToast(
-      "🌅",
-      "A new day in Tiny Land!"
-    );
-
-  }
-
-  localStorage.setItem(
-    "tinyLandLastDay",
-    today
+  showToast(
+    "🌅",
+    "A new day has arrived! +30 coins"
   );
-
-  saveGame();
-
 }
 
 
-/* =========================
-   PASSIVE COINS
-========================= */
-
-setInterval(() => {
-
-  game.coins += 2;
-
-  game.quests.earn.progress =
-    Math.min(
-      game.quests.earn.goal,
-      game.quests.earn.progress + 2
-    );
-
-  saveGame();
-
-}, 30000);
+localStorage.setItem(
+  "tinyWorldDate",
+  today
+);
 
 
-/* =========================
+/* =========================================
    INITIALIZE
-========================= */
+========================================= */
 
-createGrid();
-
-renderBuildItems();
-
-renderShop();
-
-renderInventory();
-
-renderQuests();
+document.getElementById("nameInput")
+  .value = game.name;
 
 updateUI();
+
 
 setTimeout(() => {
 
   showToast(
     "🌱",
-    "Welcome to your Tiny Land!"
+    `Welcome back to Tiny World, ${game.name}!`
   );
 
 }, 700);
-```

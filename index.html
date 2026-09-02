@@ -1,54 +1,52 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#8f7bea">
-  <title>Tiny Land 🌱</title>
+  <title>Tiny World ✦ Cozy Life</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+  <div class="background-stars"></div>
+
   <!-- TOP BAR -->
   <header class="topbar">
 
-    <div class="brand">
-      <div class="brand-icon">🌱</div>
+    <div class="logo">
+      <span class="logo-icon">🌱</span>
       <div>
-        <h1>Tiny Land</h1>
-        <p>your little world</p>
+        <strong>Tiny World</strong>
+        <small>your little cozy life</small>
       </div>
     </div>
 
-    <div class="top-stats">
-
-      <div class="stat">
+    <div class="top-info">
+      <div class="resource">
         <span>🪙</span>
-        <strong id="coins">500</strong>
+        <b id="coins">120</b>
       </div>
 
-      <div class="stat">
-        <span>⭐</span>
-        <strong id="level">1</strong>
+      <div class="resource">
+        <span>🌾</span>
+        <b id="wood">20</b>
       </div>
 
-      <div class="stat">
-        <span>❤️</span>
-        <strong id="happiness">100</strong>
+      <div class="resource">
+        <span>💎</span>
+        <b id="gems">5</b>
       </div>
-
-      <button class="icon-button" id="soundButton" title="Sound">
-        🔊
-      </button>
-
     </div>
+
+    <button class="save-btn" id="saveBtn">
+      💾 Save
+    </button>
 
   </header>
 
@@ -56,267 +54,474 @@
   <!-- MAIN -->
   <main class="game-layout">
 
-    <!-- LEFT PANEL -->
-    <aside class="side-panel">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
 
-      <section class="profile-card">
+      <div class="profile-card">
 
-        <div class="avatar">🐰</div>
-
-        <div class="profile-info">
-          <span>Island Owner</span>
-          <h2 id="playerName">Dreamer</h2>
-          <small id="dayLabel">Day 1</small>
+        <div class="avatar-wrap">
+          <div class="avatar" id="playerAvatar">🧑🏻‍🌾</div>
+          <span class="online-dot"></span>
         </div>
 
-      </section>
+        <h2 id="playerName">Mimi</h2>
+        <p id="playerMood">Feeling cozy ☁️</p>
 
+        <div class="level-box">
+          <div class="level-top">
+            <span>Level <b id="level">1</b></span>
+            <span><b id="xp">0</b>/100 XP</span>
+          </div>
 
-      <section class="level-card">
-
-        <div class="level-row">
-          <strong>Level <span id="levelText">1</span></strong>
-          <span id="xpText">0 / 100 XP</span>
+          <div class="xp-track">
+            <div class="xp-fill" id="xpBar"></div>
+          </div>
         </div>
 
-        <div class="xp-bar">
-          <div id="xpFill"></div>
-        </div>
-
-      </section>
+      </div>
 
 
-      <section class="menu-card">
+      <nav class="menu">
 
-        <button class="menu-button active" data-panel="build">
-          <span>🏡</span>
-          Build
+        <button class="menu-btn active" data-panel="world">
+          <span>🌍</span>
+          <label>My World</label>
         </button>
 
-        <button class="menu-button" data-panel="shop">
-          <span>🛒</span>
-          Shop
+        <button class="menu-btn" data-panel="shop">
+          <span>🛍️</span>
+          <label>Little Shop</label>
         </button>
 
-        <button class="menu-button" data-panel="inventory">
+        <button class="menu-btn" data-panel="inventory">
           <span>🎒</span>
-          Inventory
+          <label>Inventory</label>
         </button>
 
-        <button class="menu-button" data-panel="quests">
-          <span>✨</span>
-          Quests
+        <button class="menu-btn" data-panel="quests">
+          <span>📜</span>
+          <label>Quests</label>
         </button>
 
-      </section>
+        <button class="menu-btn" data-panel="settings">
+          <span>⚙️</span>
+          <label>Settings</label>
+        </button>
+
+      </nav>
 
 
-      <section class="weather-card">
-
-        <div class="weather-icon" id="weatherIcon">☀️</div>
+      <div class="day-card">
+        <span class="sun-icon" id="weatherIcon">☀️</span>
 
         <div>
-          <strong id="weatherName">Sunny</strong>
-          <span id="timeLabel">Morning</span>
+          <strong id="timeText">Sunny Day</strong>
+          <small id="dayText">Day 1</small>
         </div>
-
-      </section>
-
-
-      <button class="reset-button" id="resetButton">
-        ↻ Reset Island
-      </button>
+      </div>
 
     </aside>
 
 
-    <!-- GAME AREA -->
-    <section class="game-area">
-
-      <!-- Island header -->
-      <div class="island-header">
-
-        <div>
-          <span class="eyebrow">WELCOME TO</span>
-          <h2>Little Dream Island</h2>
-        </div>
-
-        <button class="save-button" id="saveButton">
-          💾 Saved
-        </button>
-
-      </div>
+    <!-- CONTENT -->
+    <section class="content">
 
 
-      <!-- GAME WORLD -->
-      <div class="world-wrapper">
+      <!-- WORLD PANEL -->
+      <section class="panel active" id="worldPanel">
 
-        <div class="cloud cloud-one">☁️</div>
-        <div class="cloud cloud-two">☁️</div>
-
-        <div class="sun">☀️</div>
-
-        <div class="island">
-
-          <div class="island-grid" id="islandGrid">
-            <!-- generated by JavaScript -->
-          </div>
-
-        </div>
-
-        <div class="water-shine shine-one"></div>
-        <div class="water-shine shine-two"></div>
-
-      </div>
-
-
-      <!-- ACTION BAR -->
-      <div class="action-bar">
-
-        <div class="selected-info">
-
-          <div class="selected-icon" id="selectedIcon">🌱</div>
+        <div class="welcome-row">
 
           <div>
-            <span>Selected</span>
-            <strong id="selectedName">Flower</strong>
+            <span class="eyebrow">MY LITTLE WORLD ✦</span>
+            <h1>Welcome home, <span id="welcomeName">Mimi</span>!</h1>
+            <p>Take care of your tiny world and make it beautiful.</p>
+          </div>
+
+          <div class="weather-card">
+            <span id="bigWeather">☀️</span>
+            <div>
+              <strong id="weatherName">Sunny</strong>
+              <small id="temperature">24°C</small>
+            </div>
           </div>
 
         </div>
 
-        <button class="action-button remove" id="removeButton">
-          🗑️ Remove
-        </button>
 
-      </div>
+        <!-- WORLD -->
+        <div class="world-card">
+
+          <div class="world-toolbar">
+
+            <div>
+              <strong>🌿 Cozy Valley</strong>
+              <span>Click things around your world!</span>
+            </div>
+
+            <div class="world-actions">
+              <button id="dayNightBtn">🌙</button>
+              <button id="weatherBtn">🌦️</button>
+            </div>
+
+          </div>
 
 
-      <!-- BUILD ITEMS -->
-      <div class="bottom-panel">
+          <div class="world" id="world">
 
-        <div class="panel-heading">
+            <!-- SKY -->
+            <div class="sky"></div>
 
+            <!-- CLOUDS -->
+            <div class="cloud cloud1">☁️</div>
+            <div class="cloud cloud2">☁️</div>
+
+            <!-- SUN / MOON -->
+            <div class="celestial" id="celestial">☀️</div>
+
+            <!-- MOUNTAINS -->
+            <div class="mountains">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <!-- GROUND -->
+            <div class="ground"></div>
+
+            <!-- RIVER -->
+            <div class="river"></div>
+
+            <!-- BRIDGE -->
+            <button class="world-object bridge" data-object="bridge">
+              🌉
+            </button>
+
+            <!-- HOUSE -->
+            <button class="world-object house" data-object="house">
+              <div class="house-roof">🏠</div>
+              <span class="object-label">My Home</span>
+            </button>
+
+            <!-- TREE -->
+            <button class="world-object tree tree1" data-object="tree">
+              🌳
+            </button>
+
+            <button class="world-object tree tree2" data-object="tree">
+              🌲
+            </button>
+
+            <button class="world-object tree tree3" data-object="tree">
+              🌳
+            </button>
+
+            <!-- FLOWERS -->
+            <button class="world-object flower flower1" data-object="flower">🌷</button>
+            <button class="world-object flower flower2" data-object="flower">🌼</button>
+            <button class="world-object flower flower3" data-object="flower">🌸</button>
+            <button class="world-object flower flower4" data-object="flower">🌻</button>
+
+            <!-- FARM -->
+            <button class="world-object farm" data-object="farm">
+              <span>🌱</span>
+              <span>🌱</span>
+              <span>🥕</span>
+              <small>Garden</small>
+            </button>
+
+            <!-- WELL -->
+            <button class="world-object well" data-object="well">
+              🪣
+            </button>
+
+            <!-- PET -->
+            <button class="world-object pet" data-object="pet">
+              🐰
+            </button>
+
+            <!-- PLAYER -->
+            <button class="player" id="player">
+              <span>🧑🏻‍🌾</span>
+              <small>Mimi</small>
+            </button>
+
+            <!-- PARTICLES -->
+            <div class="sparkle s1">✦</div>
+            <div class="sparkle s2">✧</div>
+            <div class="sparkle s3">✦</div>
+
+          </div>
+
+
+          <div class="interaction-hint">
+            ✨ <span id="interactionText">Click the house, trees, flowers, animals or garden!</span>
+          </div>
+
+        </div>
+
+
+        <!-- QUICK ACTIONS -->
+        <div class="section-heading">
           <div>
-            <span class="eyebrow">DECORATE</span>
-            <h3>Build your island</h3>
+            <h2>What do you want to do?</h2>
+            <p>Little actions make your world happier.</p>
+          </div>
+        </div>
+
+
+        <div class="action-grid">
+
+          <button class="action-card" data-action="water">
+            <span>💧</span>
+            <strong>Water Garden</strong>
+            <small>+ happiness</small>
+          </button>
+
+          <button class="action-card" data-action="harvest">
+            <span>🥕</span>
+            <strong>Harvest</strong>
+            <small>+ coins</small>
+          </button>
+
+          <button class="action-card" data-action="feed">
+            <span>🥕</span>
+            <strong>Feed Bunny</strong>
+            <small>+ friendship</small>
+          </button>
+
+          <button class="action-card" data-action="explore">
+            <span>🧺</span>
+            <strong>Explore</strong>
+            <small>find resources</small>
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- SHOP PANEL -->
+      <section class="panel" id="shopPanel">
+
+        <div class="page-title">
+          <span class="eyebrow">LITTLE SHOP 🛍️</span>
+          <h1>Make your world prettier!</h1>
+          <p>Buy cute things with your coins.</p>
+        </div>
+
+        <div class="shop-grid">
+
+          <div class="shop-item">
+            <div class="shop-icon">🌳</div>
+            <h3>Little Tree</h3>
+            <p>Add a tree to your world.</p>
+            <strong>🪙 30</strong>
+            <button data-buy="tree" data-price="30">Buy</button>
           </div>
 
-          <span class="hint">Choose an item, then tap a tile ✨</span>
+          <div class="shop-item">
+            <div class="shop-icon">🌷</div>
+            <h3>Flower Pack</h3>
+            <p>Pretty flowers for your garden.</p>
+            <strong>🪙 20</strong>
+            <button data-buy="flower" data-price="20">Buy</button>
+          </div>
+
+          <div class="shop-item">
+            <div class="shop-icon">🏡</div>
+            <h3>Cozy Decoration</h3>
+            <p>A cute decoration for home.</p>
+            <strong>🪙 60</strong>
+            <button data-buy="decoration" data-price="60">Buy</button>
+          </div>
+
+          <div class="shop-item">
+            <div class="shop-icon">🐥</div>
+            <h3>Little Chick</h3>
+            <p>A new tiny friend!</p>
+            <strong>🪙 100</strong>
+            <button data-buy="chick" data-price="100">Buy</button>
+          </div>
 
         </div>
 
-        <div class="item-list" id="buildList">
-          <!-- generated -->
+      </section>
+
+
+      <!-- INVENTORY -->
+      <section class="panel" id="inventoryPanel">
+
+        <div class="page-title">
+          <span class="eyebrow">BACKPACK 🎒</span>
+          <h1>Your little inventory</h1>
+          <p>Everything you've collected.</p>
         </div>
 
-      </div>
+        <div class="inventory-grid" id="inventoryGrid"></div>
+
+      </section>
+
+
+      <!-- QUESTS -->
+      <section class="panel" id="questsPanel">
+
+        <div class="page-title">
+          <span class="eyebrow">DAILY QUESTS 📜</span>
+          <h1>Today's little missions</h1>
+          <p>Complete them and earn rewards!</p>
+        </div>
+
+        <div class="quest-list">
+
+          <div class="quest">
+            <div class="quest-icon">🌱</div>
+
+            <div class="quest-info">
+              <strong>Take care of your garden</strong>
+              <p>Water your garden 3 times.</p>
+
+              <div class="quest-progress">
+                <div id="waterQuestBar"></div>
+              </div>
+
+              <small id="waterQuestText">0 / 3</small>
+            </div>
+
+            <span>🪙 +40</span>
+          </div>
+
+
+          <div class="quest">
+            <div class="quest-icon">🐰</div>
+
+            <div class="quest-info">
+              <strong>Be a good friend</strong>
+              <p>Feed your bunny 2 times.</p>
+
+              <div class="quest-progress">
+                <div id="feedQuestBar"></div>
+              </div>
+
+              <small id="feedQuestText">0 / 2</small>
+            </div>
+
+            <span>💎 +1</span>
+          </div>
+
+
+          <div class="quest">
+            <div class="quest-icon">🧺</div>
+
+            <div class="quest-info">
+              <strong>Explore Tiny World</strong>
+              <p>Explore 2 times.</p>
+
+              <div class="quest-progress">
+                <div id="exploreQuestBar"></div>
+              </div>
+
+              <small id="exploreQuestText">0 / 2</small>
+            </div>
+
+            <span>🪙 +50</span>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- SETTINGS -->
+      <section class="panel" id="settingsPanel">
+
+        <div class="page-title">
+          <span class="eyebrow">SETTINGS ⚙️</span>
+          <h1>Your Tiny World</h1>
+          <p>Customize your little adventure.</p>
+        </div>
+
+        <div class="settings-card">
+
+          <div class="setting-row">
+            <div>
+              <strong>Character name</strong>
+              <small>Change your character's name.</small>
+            </div>
+
+            <input id="nameInput" type="text" maxlength="15" value="Mimi">
+          </div>
+
+
+          <div class="setting-row">
+            <div>
+              <strong>Character</strong>
+              <small>Choose your little character.</small>
+            </div>
+
+            <div class="character-options">
+
+              <button data-character="🧑🏻‍🌾">🧑🏻‍🌾</button>
+              <button data-character="👩🏻‍🌾">👩🏻‍🌾</button>
+              <button data-character="🧚🏻‍♀️">🧚🏻‍♀️</button>
+              <button data-character="🧙🏻‍♀️">🧙🏻‍♀️</button>
+
+            </div>
+          </div>
+
+
+          <div class="setting-row">
+            <div>
+              <strong>Reset world</strong>
+              <small>Start your Tiny World again.</small>
+            </div>
+
+            <button class="danger-btn" id="resetBtn">
+              Reset
+            </button>
+          </div>
+
+        </div>
+
+      </section>
 
     </section>
 
   </main>
 
 
-  <!-- SHOP MODAL -->
-  <div class="modal-overlay" id="shopModal">
-
-    <div class="modal">
-
-      <button class="modal-close" data-close="shopModal">×</button>
-
-      <div class="modal-title">
-        <span>🛒</span>
-        <div>
-          <span class="eyebrow">TINY SHOP</span>
-          <h2>Little Market</h2>
-        </div>
-      </div>
-
-      <div class="shop-grid" id="shopList"></div>
-
-    </div>
-
-  </div>
-
-
-  <!-- INVENTORY MODAL -->
-  <div class="modal-overlay" id="inventoryModal">
-
-    <div class="modal">
-
-      <button class="modal-close" data-close="inventoryModal">×</button>
-
-      <div class="modal-title">
-        <span>🎒</span>
-        <div>
-          <span class="eyebrow">YOUR ITEMS</span>
-          <h2>Inventory</h2>
-        </div>
-      </div>
-
-      <div class="inventory-grid" id="inventoryList"></div>
-
-    </div>
-
-  </div>
-
-
-  <!-- QUEST MODAL -->
-  <div class="modal-overlay" id="questsModal">
-
-    <div class="modal">
-
-      <button class="modal-close" data-close="questsModal">×</button>
-
-      <div class="modal-title">
-        <span>✨</span>
-        <div>
-          <span class="eyebrow">LITTLE MISSIONS</span>
-          <h2>Daily Quests</h2>
-        </div>
-      </div>
-
-      <div id="questList"></div>
-
-    </div>
-
-  </div>
-
-
   <!-- TOAST -->
   <div class="toast" id="toast">
     <span id="toastIcon">✨</span>
-    <span id="toastText">Welcome to Tiny Land!</span>
+    <p id="toastText">Welcome to Tiny World!</p>
   </div>
 
 
-  <!-- MOBILE NAV -->
-  <nav class="mobile-nav">
+  <!-- DIALOG -->
+  <div class="dialog-overlay" id="dialogOverlay">
 
-    <button class="mobile-nav-button active" data-panel="build">
-      🏡
-      <span>Build</span>
-    </button>
+    <div class="dialog">
 
-    <button class="mobile-nav-button" data-panel="shop">
-      🛒
-      <span>Shop</span>
-    </button>
+      <button class="close-dialog" id="closeDialog">×</button>
 
-    <button class="mobile-nav-button" data-panel="inventory">
-      🎒
-      <span>Bag</span>
-    </button>
+      <div class="dialog-character" id="dialogCharacter">🌳</div>
 
-    <button class="mobile-nav-button" data-panel="quests">
-      ✨
-      <span>Quests</span>
-    </button>
+      <h2 id="dialogTitle">Hello!</h2>
 
-  </nav>
+      <p id="dialogText">
+        Something cute happened.
+      </p>
+
+      <button class="dialog-ok" id="dialogOk">
+        Aww, okay! ✨
+      </button>
+
+    </div>
+
+  </div>
 
 
   <script src="script.js"></script>
 
 </body>
 </html>
-```
